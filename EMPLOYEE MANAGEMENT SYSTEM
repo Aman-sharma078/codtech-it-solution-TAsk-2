@@ -1,0 +1,222 @@
+TASK 2 -> EMPLOYEE MANAGEMENT SYSTEM <-
+
+create database employeerecords1;
+Query OK, 1 row affected (0.008 sec)
+
+MariaDB [(none)]> use  employeerecords1;
+Database changed
+MariaDB [employeerecords1]>
+
+### Departments Table:
+
+CREATE TABLE Departments (
+    DepartmentID INT PRIMARY KEY AUTO_INCREMENT,
+    DepartmentName VARCHAR(255) NOT NULL,
+    Location VARCHAR(255)
+);
+
+
+### JobPositions Table:
+
+CREATE TABLE JobPositions (
+    JobPositionID INT PRIMARY KEY AUTO_INCREMENT,
+    PositionTitle VARCHAR(255) NOT NULL,
+    Description TEXT
+);
+
+
+### Employees Table:
+
+CREATE TABLE Employees (
+    EmployeeID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName VARCHAR(100) NOT NULL,
+    LastName VARCHAR(100) NOT NULL,
+    BirthDate DATE,
+    HireDate DATE,
+    DepartmentID INT,
+    JobPositionID INT,
+    FOREIGN KEY (DepartmentID) REFERENCES Departments(DepartmentID),
+    FOREIGN KEY (JobPositionID) REFERENCES JobPositions(JobPositionID)
+);
+
+### Salaries Table:
+
+CREATE TABLE Salaries (
+    SalaryID INT PRIMARY KEY AUTO_INCREMENT,
+    EmployeeID INT,
+    SalaryAmount DECIMAL(10, 2),
+    EffectiveDate DATE,
+    FOREIGN KEY (EmployeeID) REFERENCES Employees(EmployeeID)
+);
+
+
+### Adding a Department:
+
+INSERT INTO Departments (DepartmentID,DepartmentName, Location)VALUES (001, 'Engineering','Washington DC');
+INSERT INTO Departments (DepartmentID,DepartmentName, Location)VALUES (002, 'Management','Surat');
+INSERT INTO Departments (DepartmentID,DepartmentName, Location)VALUES (003, 'IT','Banglore');
+
+
+### Adding a Job Position:
+
+INSERT INTO JobPositions (PositionTitle, Description)
+      VALUES ('Software Engineer', 'Develops and maintains software applications.');
+
+
+        INSERT INTO JobPositions (PositionTitle, Description)
+      VALUES('HR Manager', 'Manages employee relations and recruitment.');
+
+
+ INSERT INTO JobPositions (PositionTitle, Description)
+   VALUES ('Web Developer', 'Develops and maintains Websites');
+
+
+### Adding an Employee:
+
+INSERT INTO Employees (FirstName, LastName, BirthDate, HireDate, DepartmentID, JobPositionID)
+VALUES ('Aman','Sharma', '2003-10-05', '2020-01-10', 2, 1),
+       ('Dhruv','Bhaskar', '1999-03-22', '2021-07-15', 1, 2),
+       ('Devansh','Gulati', '2003-05-05', '2022-01-10', 3, 2),
+       ('Sahil','Dahiya', '2001-02-05', '2019-01-02', 3, 1),
+       ('Prince','kumar', '2003-10-05', '2012-06-07', 1, 3),
+       ('Hiren','Mudghal', '1998-10-05', '2013-03-10', 2, 2),
+       ('Mathur','Swamy', '1987-10-05', '2014-05-10', 3, 3);
+
+### Adding a Salary Record:
+
+INSERT INTO Salaries (EmployeeID, SalaryAmount, EffectiveDate)
+VALUES (1, 90000.00, '2024-01-01'),
+       (2, 75000.00, '2024-01-01'),
+       (3, 60000.00, '2024-02-01'),
+       (4, 95000.00, '2024-03-01'),
+       (5, 670000.00, '2024-04-01'),
+       (6, 150000.00, '2024-05-01'),
+       (7, 400000.00, '2024-06-01');
+
+*Fetching All Employees with Their Department and Position*:
+
+SELECT e.EmployeeID, e.FirstName, e.LastName, d.DepartmentName, j.PositionTitle
+FROM Employees e
+JOIN Departments d ON e.DepartmentID = d.DepartmentID
+JOIN JobPositions j ON e.JobPositionID = j.JobPositionID;
+
+Output:
++------------+-----------+----------+----------------+-------------------+
+| EmployeeID | FirstName | LastName | DepartmentName | PositionTitle     |
++------------+-----------+----------+----------------+-------------------+
+|          2 | Dhruv     | Bhaskar  | Engineering    | HR Manager        |
+|          5 | Prince    | kumar    | Engineering    | Web Developer     |
+|          1 | Aman      | Sharma   | Management     | Software Engineer |
+|          6 | Hiren     | Mudghal  | Management     | HR Manager        |
+|          3 | Devansh   | Gulati   | IT             | HR Manager        |
+|          4 | Sahil     | Dahiya   | IT             | Software Engineer |
+|          7 | Mathur    | Swamy    | IT             | Web Developer     |
++------------+-----------+----------+----------------+-------------------+
+
+
+*Fetching Salary History for an Employee*:
+
+SELECT e.FirstName, e.LastName, s.SalaryAmount, s.EffectiveDate
+FROM Salaries s
+JOIN Employees e ON s.EmployeeID = e.EmployeeID
+WHERE e.EmployeeID = 1;
+
+Output:
+
++-----------+----------+--------------+---------------+
+| FirstName | LastName | SalaryAmount | EffectiveDate |
++-----------+----------+--------------+---------------+
+| Aman      | Sharma   |     90000.00 | 2024-01-01    |
++-----------+----------+--------------+---------------+
+
+
+*Fetching All Employees in a Specific Department*:
+
+SELECT e.EmployeeID, e.FirstName, e.LastName, j.PositionTitle
+FROM Employees e
+JOIN JobPositions j ON e.JobPositionID = j.JobPositionID
+WHERE e.DepartmentID = 2; 
+
+Output:
+
++------------+-----------+----------+-------------------+
+| EmployeeID | FirstName | LastName | PositionTitle     |
++------------+-----------+----------+-------------------+
+|          1 | Aman      | Sharma   | Software Engineer |
+|          6 | Hiren     | Mudghal  | HR Manager        |
++------------+-----------+----------+-------------------+
+
+*Updating an Employee’s Department*
+
+UPDATE Employees
+SET DepartmentID = 1  
+WHERE EmployeeID = 2;
+
+Output:
+
+Before Update:
+
++------------+-----------+----------+------------+------------+--------------+---------------+
+| EmployeeID | FirstName | LastName | BirthDate  | HireDate   | DepartmentID | JobPositionID |
++------------+-----------+----------+------------+------------+--------------+---------------+
+|          1 | Aman      | Sharma   | 2003-10-05 | 2020-01-10 |            2 |             1 |
+|          2 | Dhruv     | Bhaskar  | 1999-03-22 | 2021-07-15 |            1 |             2 |
+|          3 | Devansh   | Gulati   | 2003-05-05 | 2022-01-10 |            3 |             2 |
+|          4 | Sahil     | Dahiya   | 2001-02-05 | 2019-01-02 |            3 |             1 |
+|          5 | Prince    | kumar    | 2003-10-05 | 2012-06-07 |            1 |             3 |
+|          6 | Hiren     | Mudghal  | 1998-10-05 | 2013-03-10 |            2 |             2 |
+|          7 | Mathur    | Swamy    | 1987-10-05 | 2014-05-10 |            3 |             3 |
++------------+-----------+----------+------------+------------+--------------+---------------+
+
+After Update:
+
++------------+-----------+----------+------------+------------+--------------+---------------+
+| EmployeeID | FirstName | LastName | BirthDate  | HireDate   | DepartmentID | JobPositionID |
++------------+-----------+----------+------------+------------+--------------+---------------+
+|          1 | Aman      | Sharma   | 2003-10-05 | 2020-01-10 |            2 |             1 |
+|          2 | Dhruv     | Bhaskar  | 1999-03-22 | 2021-07-15 |            2 |             2 |
+|          3 | Devansh   | Gulati   | 2003-05-05 | 2022-01-10 |            3 |             2 |
+|          4 | Sahil     | Dahiya   | 2001-02-05 | 2019-01-02 |            3 |             1 |
+|          5 | Prince    | kumar    | 2003-10-05 | 2012-06-07 |            2 |             3 |
+|          6 | Hiren     | Mudghal  | 1998-10-05 | 2013-03-10 |            2 |             2 |
+|          7 | Mathur    | Swamy    | 1987-10-05 | 2014-05-10 |            3 |             3 |
++------------+-----------+----------+------------+------------+--------------+---------------+
+
+*Deleting a Job Position (Only if no employees are assigned)*
+
+DELETE FROM JobPositions
+WHERE JobPositionID = 2
+AND NOT EXISTS (
+    SELECT 1
+    FROM Employees
+    WHERE JobPositionID = 2
+);
+
+Output:
+
++---------------+-------------------+-----------------------------------------------+
+| JobPositionID | PositionTitle     | Description                                   |
++---------------+-------------------+-----------------------------------------------+
+|             1 | Software Engineer | Develops and maintains software applications. |
+|             2 | HR Manager        | Manages employee relations and recruitment.   |
+|             3 | Web Developer     | Develops and maintains Websites               |
++---------------+-------------------+-----------------------------------------------+
+
+*Fetching the Highest Salary for Each Department*
+
+
+SELECT d.DepartmentName, MAX(s.SalaryAmount) AS HighestSalary
+FROM Employees e
+JOIN Departments d ON e.DepartmentID = d.DepartmentID
+JOIN Salaries s ON e.EmployeeID = s.EmployeeID
+GROUP BY d.DepartmentName;
+
+Output:
+
++----------------+---------------+
+| DepartmentName | HighestSalary |
++----------------+---------------+
+| Engineering    |     670000.00 |
+| IT             |     400000.00 |
+| Management     |     150000.00 |
++----------------+---------------+
